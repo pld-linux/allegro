@@ -28,8 +28,7 @@ Group:		Libraries
 Source0:	http://downloads.sourceforge.net/alleg/%{name}-%{version}.tar.gz
 # Source0-md5:	0f1cfff8f2cf88e5c91a667d9fd386ec
 Patch0:		%{name}-info.patch
-#Patch1: %{name}-frame-pointer.patch
-Patch2:		%{name}-config.patch
+Patch1:		%{name}-config.patch
 URL:		http://alleg.sourceforge.net/
 BuildRequires:	OpenGL-GLU-devel
 BuildRequires:	OpenGL-devel
@@ -41,7 +40,7 @@ BuildRequires:	libpng-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	pkgconfig
-#%{?with_svga:BuildRequires:	svgalib-devel}
+%{?with_svga:BuildRequires:	svgalib-devel}
 BuildRequires:	texinfo
 BuildRequires:	xorg-lib-libX11-devel
 BuildRequires:	xorg-lib-libXcursor-devel
@@ -327,14 +326,14 @@ biblioteki allegro.
 %prep
 %setup -q
 %patch0 -p1
-#%%patch1 -p1
-%patch2 -p1
+%patch1 -p1
 
 %build
 install -d build
 cd build
 %cmake .. \
 	-DCMAKE_BUILD_TYPE=%{!?debug:Release}%{?debug:Debug} \
+	-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
 	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
 	-DCMAKE_VERBOSE_MAKEFILE=1 \
 	-DMANDIR=%{_mandir} \
