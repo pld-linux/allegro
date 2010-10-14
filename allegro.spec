@@ -1,5 +1,6 @@
 #
-# TODO: shared gl, jpg, loadpng, logg (instead of static)?
+# TODO: shared gl, jpg, loadpng, logg (instead of static);
+#       create -addons, -addons-devel (with proper Rs)
 #
 # Conditional build:
 %bcond_without	alsa	# without ALSA modules
