@@ -1,7 +1,5 @@
 #
-# TODO: - check (and update if required) allegro-frame-pointer.patch
-#	- unpackaged files
-#	- create bconds for gl, jpg, loadpng and logg
+# TODO: shared gl, jpg, loadpng, logg (instead of static)?
 #
 # Conditional build:
 %bcond_without	alsa	# without ALSA modules
@@ -80,6 +78,12 @@ Summary(es.UTF-8):	Archivos de inclusión
 Summary(pl.UTF-8):	Biblioteka do programowania gier - pliki nagłówkowe
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	xorg-lib-libX11-devel
+Requires:	xorg-lib-libXcursor-devel
+Requires:	xorg-lib-libXext-devel
+Requires:	xorg-lib-libXpm-devel
+Requires:	xorg-lib-libXxf86vm-devel
+Obsoletes:	allegro-static
 
 %description devel
 Allegro is a cross-platform library intended for use in computer games
@@ -115,31 +119,6 @@ grach komputerowych i innych rodzajach oprogramowania multimedialnego.
 
 Ten pakiet zawiera pliki nagłówkowe niezbędne do kompilowania
 aplikacji wykorzystujących bibliotekę allegro.
-
-%package static
-Summary:	A game programming library - static libraries
-Summary(pl.UTF-8):	Biblioteka do programowania gier - biblioteki statyczne
-Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{release}
-Requires:	xorg-lib-libX11-devel
-Requires:	xorg-lib-libXcursor-devel
-Requires:	xorg-lib-libXext-devel
-Requires:	xorg-lib-libXpm-devel
-Requires:	xorg-lib-libXxf86vm-devel
-
-%description static
-Allegro is a cross-platform library intended for use in computer games
-and other types of multimedia programming.
-
-This package contains static libraries for linking with allegro
-applications.
-
-%description static -l pl.UTF-8
-Allegro jest przenośną biblioteką przeznaczoną do wykorzystania w
-grach komputerowych i innych rodzajach oprogramowania multimedialnego.
-
-Ten pakiet zawiera biblioteki statyczne do konsolidacji z aplikacjami
-wykorzystującymi allegro.
 
 %package dga2
 Summary:	A game programming library - DGA2 module
@@ -394,6 +373,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/allegro-config
 %attr(755,root,root) %{_libdir}/liballeg.so
+# static-only
+%{_libdir}/liballeggl.a
+%{_libdir}/libjpgalleg.a
+%{_libdir}/libloadpng.a
+%{_libdir}/liblogg.a
 %{_includedir}/alleggl.h
 %{_includedir}/allegro.h
 %{_includedir}/jpgalleg.h
@@ -411,14 +395,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_pkgconfigdir}/jpgalleg.pc
 %{_pkgconfigdir}/loadpng.pc
 %{_pkgconfigdir}/logg.pc
-
-%files static
-%defattr(644,root,root,755)
-# XXX: static-only libs belong to -devel!
-%{_libdir}/liballeggl.a
-%{_libdir}/libjpgalleg.a
-%{_libdir}/libloadpng.a
-%{_libdir}/liblogg.a
 
 %if %{with dga2}
 %files dga2
