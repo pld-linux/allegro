@@ -315,6 +315,7 @@ cd build
 %cmake .. \
 	-DCMAKE_BUILD_TYPE=%{!?debug:Release}%{?debug:Debug} \
 	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
+	-DCMAKE_VERBOSE_MAKEFILE=1 \
 	-DMANDIR=%{_mandir} \
 	-DINFODIR=%{_infodir} \
 	-DPLATFORM_LIBS=-ldl \
@@ -345,21 +346,25 @@ cp build/docs/man/* $RPM_BUILD_ROOT%{_mandir}/man3
 mv $RPM_BUILD_ROOT%{_bindir}/play{,-allegro}
 mv $RPM_BUILD_ROOT%{_bindir}/test{,-allegro}
 
+%{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc/allegro-4.4.1
+
 %clean
+rm -rf $RPM_BUILD_ROOT
+
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%post devel	-p	/sbin/postshell
+%post	devel -p /sbin/postshell
 -/usr/sbin/fix-info-dir -c %{_infodir}
 
-%postun devel	-p	/sbin/postshell
+%postun	devel -p /sbin/postshell
 -/usr/sbin/fix-info-dir -c %{_infodir}
 
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS CHANGES THANKS readme.txt todo.txt
 %attr(755,root,root) %{_libdir}/liballeg.so.*.*.*
-%attr(755,root,root) %{_libdir}/liballeg.so
+%attr(755,root,root) %ghost %{_libdir}/liballeg.so.4.4
 %dir %{_libdir}/allegro
 %dir %{_libdir}/allegro/4.4.1
 %{_libdir}/allegro/4.4.1/modules.lst
@@ -367,9 +372,17 @@ mv $RPM_BUILD_ROOT%{_bindir}/test{,-allegro}
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/allegro-config
-%{_includedir}/*
-%{_mandir}/man3/*
-%{_infodir}/*.info*
+%attr(755,root,root) %{_libdir}/liballeg.so
+%{_includedir}/alleggl.h
+%{_includedir}/allegro.h
+%{_includedir}/jpgalleg.h
+%{_includedir}/logg.h
+%{_includedir}/xalleg.h
+%{_includedir}/allegro
+%{_includedir}/allegrogl
+# XXX: aren't some names too generic?
+%{_mandir}/man3/*.3*
+%{_infodir}/allegro.info*
 %{_pkgconfigdir}/allegro.pc
 %{_pkgconfigdir}/allegrogl.pc
 %{_pkgconfigdir}/jpgalleg.pc
@@ -378,6 +391,7 @@ mv $RPM_BUILD_ROOT%{_bindir}/test{,-allegro}
 
 %files static
 %defattr(644,root,root,755)
+# XXX: static-only libs belong to -devel!
 %{_libdir}/liballeggl.a
 %{_libdir}/libjpgalleg.a
 %{_libdir}/libloadpng.a
