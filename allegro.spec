@@ -1,6 +1,5 @@
 #
 # TODO: - check (and update if required) allegro-frame-pointer.patch
-#	- check allegro-vga and allegro-svga packages if they should contains any files
 #	- unpackaged files
 #	- create bconds for gl, jpg, loadpng and logg
 #
@@ -9,8 +8,12 @@
 %bcond_without	dga2	# without DGA2 module
 %bcond_without	jack	# without JACK module
 %bcond_without	svga	# without svgalib module
-%bcond_without	vga	# without vga module
+%bcond_without	vga	# without vga module (x86-only)
 #
+%ifnarch %{ix86}
+# x86_64 too?
+%undefine	with_vga
+%endif
 Summary:	A game programming library
 Summary(de.UTF-8):	Eine Bibliothek zur Programmierung von Spielen
 Summary(es.UTF-8):	Una biblioteca de programación de juegos
@@ -139,24 +142,6 @@ grach komputerowych i innych rodzajach oprogramowania multimedialnego.
 Ten pakiet zawiera biblioteki statyczne do konsolidacji z aplikacjami
 wykorzystującymi allegro.
 
-%package svgalib
-Summary:	A game programming library - svgalib module
-Summary(pl.UTF-8):	Biblioteka do programowania gier - moduł dla svgalib
-Group:		Libraries
-Requires:	%{name} = %{version}-%{release}
-
-%description svgalib
-Allegro is a cross-platform library intended for use in computer games
-and other types of multimedia programming.
-
-This package contains module for use with allegro and svgalib.
-
-%description svgalib -l pl.UTF-8
-Allegro jest przenośną biblioteką przeznaczoną do wykorzystania w
-grach komputerowych i innych rodzajach oprogramowania multimedialnego.
-
-Ten pakiet zawiera moduł do wykorzystania allegro z svgalibem.
-
 %package dga2
 Summary:	A game programming library - DGA2 module
 Summary(pl.UTF-8):	Biblioteka do programowania gier - moduł dla DGA2
@@ -174,6 +159,42 @@ Allegro jest przenośną biblioteką przeznaczoną do wykorzystania w
 grach komputerowych i innych rodzajach oprogramowania multimedialnego.
 
 Ten pakiet zawiera moduł do wykorzystania z DGA.
+
+%package fbcon
+Summary:	A game programming library - FrameBuffer module
+Summary(pl.UTF-8):	Biblioteka do programowania gier - moduł dla FrameBuffera
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description fbcon
+Allegro is a cross-platform library intended for use in computer games
+and other types of multimedia programming.
+
+This package contains module for use with Linux FrameBuffer.
+
+%description fbcon -l pl.UTF-8
+Allegro jest przenośną biblioteką przeznaczoną do wykorzystania w
+grach komputerowych i innych rodzajach oprogramowania multimedialnego.
+
+Ten pakiet zawiera moduł do wykorzystania z linuksowym FrameBufferem.
+
+%package svgalib
+Summary:	A game programming library - svgalib module
+Summary(pl.UTF-8):	Biblioteka do programowania gier - moduł dla svgalib
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description svgalib
+Allegro is a cross-platform library intended for use in computer games
+and other types of multimedia programming.
+
+This package contains module for use with allegro and svgalib.
+
+%description svgalib -l pl.UTF-8
+Allegro jest przenośną biblioteką przeznaczoną do wykorzystania w
+grach komputerowych i innych rodzajach oprogramowania multimedialnego.
+
+Ten pakiet zawiera moduł do wykorzystania allegro z svgalibem.
 
 %package vga
 Summary:	A game programming library - vga module
@@ -319,6 +340,7 @@ cd build
 	-DMANDIR=%{_mandir} \
 	-DINFODIR=%{_infodir} \
 	-DPLATFORM_LIBS=-ldl \
+	-DWANT_LINUX_CONSOLE=1 \
 	%{!?with_vga:-DWANT_LINUX_VGA=off} \
 	%{!?with_svga:-DWANT_LINUX_SVGALIB=off} \
 %if "%{_lib}" == "lib64"
@@ -376,6 +398,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/alleggl.h
 %{_includedir}/allegro.h
 %{_includedir}/jpgalleg.h
+%{_includedir}/linalleg.h
+%{_includedir}/loadpng.h
 %{_includedir}/logg.h
 %{_includedir}/xalleg.h
 %{_includedir}/allegro
@@ -397,24 +421,26 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libloadpng.a
 %{_libdir}/liblogg.a
 
-%if %{with svga}
-%files svgalib
-%defattr(644,root,root,755)
-#%%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-svgalib.so
-%endif
-
 %if %{with dga2}
 %files dga2
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/allegro/4.4.1/alleg-dga2.so
 %endif
 
-%ifarch %{ix86}
+%files fbcon
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/allegro/4.4.1/alleg-fbcon.so
+
+%if %{with svga}
+%files svgalib
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/allegro/4.4.1/alleg-svgalib.so
+%endif
+
 %if %{with vga}
 %files vga
 %defattr(644,root,root,755)
-#%%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-vga.so
-%endif
+%attr(755,root,root) %{_libdir}/allegro/4.4.1/alleg-vga.so
 %endif
 
 %if %{with alsa}
