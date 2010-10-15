@@ -1,7 +1,4 @@
 #
-# TODO: shared gl, jpg, loadpng, logg (instead of static);
-#       create -addons, -addons-devel (with proper Rs)
-#
 # Conditional build:
 %bcond_without	alsa	# without ALSA modules
 %bcond_without	dga2	# without DGA2 module
@@ -39,6 +36,7 @@ BuildRequires:	libpng-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	pkgconfig
+BuildRequires:	sed >= 4.0
 %{?with_svga:BuildRequires:	svgalib-devel}
 BuildRequires:	texinfo
 BuildRequires:	xorg-lib-libX11-devel
@@ -231,6 +229,37 @@ grach komputerowych i innych rodzajach oprogramowania multimedialnego.
 
 Ten pakiet zawiera moduł do wykorzystania z biblioteką dźwiękową JACK.
 
+%package addons
+Summary:	Allegro addon libraries
+Summary(pl.UTF-8):	Dodatkowe biblioteki Allegro
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description addons
+Allegro addon libraries: AllegroGL, JPGAlleg, loadpng, logg.
+
+%description addons -l pl.UTF-8
+Dodatkowe biblioteki Allegro: AllegroGL, JPGAlleg, loadpng, logg.
+
+%package addons-devel
+Summary:	Header files for Allegro addon libraries
+Summary(pl.UTF-8):	Pliki nagłówkowe dodatkowych bibliotek Allegro
+Group:		Development/Libraries
+Requires:	%{name}-addons = %{version}-%{release}
+Requires:	%{name}-devel = %{version}-%{release}
+Requires:	OpenGL-GLU-devel
+Requires:	OpenGL-devel
+Requires:	libpng-devel
+Requires:	libvorbis-devel
+
+%description addons-devel
+Header files for Allegro addon libraries: AllegroGL, JPGAlleg,
+loadpng, logg.
+
+%description addons-devel -l pl.UTF-8
+Pliki nagłówkowe dodatkowych bibliotek Allegro: AllegroGL, JPGAlleg,
+loadpng, logg.
+
 %package tools
 Summary:	A game programming library - tools
 Summary(de.UTF-8):	Zusätzliche Hilfprogramme für die Allegro Bibliothek
@@ -308,6 +337,8 @@ biblioteki allegro.
 %patch0 -p1
 %patch1 -p1
 
+sed -i -e 's/ADDON_LINKAGE STATIC/ADDON_LINKAGE SHARED/' CMakeLists.txt
+
 %build
 install -d build
 cd build
@@ -361,6 +392,9 @@ rm -rf $RPM_BUILD_ROOT
 %postun	devel -p /sbin/postshell
 -/usr/sbin/fix-info-dir -c %{_infodir}
 
+%post	addons -p /sbin/ldconfig
+%postun	addons -p /sbin/ldconfig
+
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS CHANGES THANKS readme.txt todo.txt
@@ -374,28 +408,14 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/allegro-config
 %attr(755,root,root) %{_libdir}/liballeg.so
-# static-only
-%{_libdir}/liballeggl.a
-%{_libdir}/libjpgalleg.a
-%{_libdir}/libloadpng.a
-%{_libdir}/liblogg.a
-%{_includedir}/alleggl.h
-%{_includedir}/allegro.h
-%{_includedir}/jpgalleg.h
-%{_includedir}/linalleg.h
-%{_includedir}/loadpng.h
-%{_includedir}/logg.h
-%{_includedir}/xalleg.h
 %{_includedir}/allegro
-%{_includedir}/allegrogl
+%{_includedir}/allegro.h
+%{_includedir}/linalleg.h
+%{_includedir}/xalleg.h
 # XXX: aren't some names too generic?
 %{_mandir}/man3/*.3*
 %{_infodir}/allegro.info*
 %{_pkgconfigdir}/allegro.pc
-%{_pkgconfigdir}/allegrogl.pc
-%{_pkgconfigdir}/jpgalleg.pc
-%{_pkgconfigdir}/loadpng.pc
-%{_pkgconfigdir}/logg.pc
 
 %if %{with dga2}
 %files dga2
@@ -431,6 +451,33 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/allegro/4.4.1/alleg-jack.so
 %endif
+
+%files addons
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/liballeggl.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/liballeggl.so.4.4
+%attr(755,root,root) %{_libdir}/libjpgalleg.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libjpgalleg.so.4.4
+%attr(755,root,root) %{_libdir}/libloadpng.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libloadpng.so.4.4
+%attr(755,root,root) %{_libdir}/liblogg.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/liblogg.so.4.4
+
+%files addons-devel
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/liballeggl.so
+%attr(755,root,root) %{_libdir}/libjpgalleg.so
+%attr(755,root,root) %{_libdir}/libloadpng.so
+%attr(755,root,root) %{_libdir}/liblogg.so
+%{_includedir}/allegrogl
+%{_includedir}/alleggl.h
+%{_includedir}/jpgalleg.h
+%{_includedir}/loadpng.h
+%{_includedir}/logg.h
+%{_pkgconfigdir}/allegrogl.pc
+%{_pkgconfigdir}/jpgalleg.pc
+%{_pkgconfigdir}/loadpng.pc
+%{_pkgconfigdir}/logg.pc
 
 %files tools
 %defattr(644,root,root,755)
