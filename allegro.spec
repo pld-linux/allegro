@@ -234,6 +234,7 @@ Summary:	Allegro addon libraries
 Summary(pl.UTF-8):	Dodatkowe biblioteki Allegro
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
+Obsoletes:	allegro-gl
 
 %description addons
 Allegro addon libraries: AllegroGL, JPGAlleg, loadpng, logg.
@@ -251,6 +252,7 @@ Requires:	OpenGL-GLU-devel
 Requires:	OpenGL-devel
 Requires:	libpng-devel
 Requires:	libvorbis-devel
+Obsoletes:	allegro-gl-devel
 
 %description addons-devel
 Header files for Allegro addon libraries: AllegroGL, JPGAlleg,
