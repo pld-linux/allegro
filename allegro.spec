@@ -36,6 +36,7 @@ BuildRequires:	libpng-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	pkgconfig
+BuildRequires:	rpmbuild(macros) >= 1.577
 BuildRequires:	sed >= 4.0
 %{?with_svga:BuildRequires:	svgalib-devel}
 BuildRequires:	texinfo
@@ -345,19 +346,11 @@ sed -i -e 's/ADDON_LINKAGE STATIC/ADDON_LINKAGE SHARED/' CMakeLists.txt
 install -d build
 cd build
 %cmake .. \
-	-DCMAKE_BUILD_TYPE=%{!?debug:Release}%{?debug:Debug} \
-	-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
-	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
-	-DCMAKE_VERBOSE_MAKEFILE=1 \
-	-DMANDIR=%{_mandir} \
 	-DINFODIR=%{_infodir} \
 	-DPLATFORM_LIBS=-ldl \
 	-DWANT_LINUX_CONSOLE=1 \
 	%{!?with_vga:-DWANT_LINUX_VGA=off} \
-	%{!?with_svga:-DWANT_LINUX_SVGALIB=off} \
-%if "%{_lib}" == "lib64"
-	-DLIB_SUFFIX=64
-%endif
+	%{!?with_svga:-DWANT_LINUX_SVGALIB=off}
 
 %{__make}
 
