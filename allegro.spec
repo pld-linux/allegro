@@ -3,7 +3,7 @@
 %bcond_without	alsa	# without ALSA modules
 %bcond_without	dga2	# without DGA2 module
 %bcond_without	jack	# without JACK module
-%bcond_without	svga	# without svgalib module
+%bcond_with	svga	# without svgalib module
 %bcond_without	vga	# without vga module (x86-only)
 #
 %ifnarch %{ix86}
