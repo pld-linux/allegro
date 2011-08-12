@@ -28,7 +28,7 @@ Patch1:		%{name}-config.patch
 URL:		http://alleg.sourceforge.net/
 BuildRequires:	OpenGL-GLU-devel
 BuildRequires:	OpenGL-devel
-%{?with_alsa:BuildRequires:	alsa-lib-devel}
+%{?with_alsa:BuildRequires:	alsa-lib-devel >= 0.9}
 BuildRequires:	cmake >= 2.6
 BuildRequires:	jack-audio-connection-kit-devel
 BuildRequires:	libogg-devel
@@ -348,9 +348,10 @@ cd build
 %cmake .. \
 	-DINFODIR=%{_infodir} \
 	-DPLATFORM_LIBS=-ldl \
-	-DWANT_LINUX_CONSOLE=1 \
-	%{!?with_vga:-DWANT_LINUX_VGA=off} \
-	%{!?with_svga:-DWANT_LINUX_SVGALIB=off}
+	%{!?with_alsa:-DWANT_ALSA=OFF} \
+	-DWANT_LINUX_CONSOLE=ON \
+	%{!?with_vga:-DWANT_LINUX_VGA=OFF} \
+	%{!?with_svga:-DWANT_LINUX_SVGALIB=OFF}
 
 %{__make}
 
