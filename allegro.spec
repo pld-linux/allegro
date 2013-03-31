@@ -1,10 +1,10 @@
 #
 # Conditional build:
-%bcond_without	alsa	# without ALSA modules
-%bcond_without	dga2	# without DGA2 module
-%bcond_without	jack	# without JACK module
-%bcond_with	svga	# without svgalib module
-%bcond_without	vga	# without vga module (x86-only)
+%bcond_without	alsa	# ALSA modules
+%bcond_without	dga2	# DGA2 module
+%bcond_without	jack	# JACK module
+%bcond_with	svga	# svgalib module
+%bcond_without	vga	# vga module (x86-only)
 #
 %ifnarch %{ix86}
 # x86_64 too?
@@ -18,13 +18,14 @@ Summary(it.UTF-8):	Una libreria per la programmazione di videogiochi
 Summary(pl.UTF-8):	Biblioteka do programowania gier
 Name:		allegro
 Version:	4.4.2
-Release:	3
+Release:	4
 License:	Giftware
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/alleg/%{name}-%{version}.tar.gz
 # Source0-md5:	4db71b0460fc99926ae91d223199c2e6
 Patch0:		%{name}-info.patch
 Patch1:		%{name}-config.patch
+Patch2:		%{name}-man-prefix.patch
 URL:		http://alleg.sourceforge.net/
 BuildRequires:	OpenGL-GLU-devel
 BuildRequires:	OpenGL-devel
@@ -339,8 +340,9 @@ biblioteki allegro.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
-sed -i -e 's/ADDON_LINKAGE STATIC/ADDON_LINKAGE SHARED/' CMakeLists.txt
+%{__sed} -i -e 's/ADDON_LINKAGE STATIC/ADDON_LINKAGE SHARED/' CMakeLists.txt
 
 %build
 install -d build
@@ -408,8 +410,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/allegro.h
 %{_includedir}/linalleg.h
 %{_includedir}/xalleg.h
-# XXX: aren't some names too generic?
-%{_mandir}/man3/*.3*
+# original names were too generic, man-prefix patch adds "allegro-" prefix
+%{_mandir}/man3/allegro-*.3*
 %{_infodir}/allegro.info*
 %{_pkgconfigdir}/allegro.pc
 

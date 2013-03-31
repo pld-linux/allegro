@@ -1,0 +1,49 @@
+--- allegro-4.4.2/docs/src/makedoc/makeman.c.orig	2005-09-24 04:30:04.000000000 +0200
++++ allegro-4.4.2/docs/src/makedoc/makeman.c	2013-03-31 14:34:45.839923935 +0200
+@@ -21,6 +21,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <stdlib.h>
++#include <limits.h>
+ #include <assert.h>
+ 
+ #include "makeman.h"
+@@ -52,7 +53,7 @@
+  */
+ int write_man(char *filename)
+ {
+-   char buf[256], buf2[256];
++   char buf[PATH_MAX], buf2[PATH_MAX];
+    char *xref[256];
+    int xrefs = 0;
+    LINE *line = head;
+@@ -98,9 +99,7 @@
+ 
+ 	    if (p) {
+ 	       strcpy(buf, filename);
+-	       strcpy(get_filename(buf), p);
+-	       strcat(buf, ".");
+-	       strcat(buf, get_extension(filename));
++	       sprintf(get_filename(buf), "allegro-%s.%s", p, get_extension(filename));
+ 
+ 	       /*printf("writing %s\n", buf);*/
+ 	       f = fopen(buf, "w");
+@@ -163,16 +162,14 @@
+ 
+ 		     if (p) {
+ 			strcpy(buf2, filename);
+-			strcpy(get_filename(buf2), p);
+-			strcat(buf2, ".");
+-			strcat(buf2, get_extension(filename));
++			sprintf(get_filename(buf2), "allegro-%s.%s", p, get_extension(filename));
+ 
+ 			/*printf("writing %s\n", buf2);*/
+ 			f2 = fopen(buf2, "w");
+ 			if (!f2)
+ 			   return 1;
+ 
+-			fprintf(f2, ".so man%s/%s\n", get_extension(filename), get_filename(buf));
++			fprintf(f2, ".so man%s/allegro-%s\n", get_extension(filename), get_filename(buf));
+ 			fclose(f2);
+ 		     }
+ 
