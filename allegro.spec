@@ -26,6 +26,7 @@ Source0:	http://downloads.sourceforge.net/alleg/%{name}-%{version}.tar.gz
 Patch0:		%{name}-info.patch
 Patch1:		%{name}-config.patch
 Patch2:		%{name}-man-prefix.patch
+Patch3:		%{name}-format.patch
 URL:		http://alleg.sourceforge.net/
 BuildRequires:	OpenGL-GLU-devel
 BuildRequires:	OpenGL-devel
@@ -341,6 +342,7 @@ biblioteki allegro.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %{__sed} -i -e 's/ADDON_LINKAGE STATIC/ADDON_LINKAGE SHARED/' CMakeLists.txt
 

@@ -43,7 +43,7 @@
  			   return 1;
  
 -			fprintf(f2, ".so man%s/%s\n", get_extension(filename), get_filename(buf));
-+			fprintf(f2, ".so man%s/allegro-%s\n", get_extension(filename), get_filename(buf));
++			fprintf(f2, ".so man%s/%s\n", get_extension(filename), get_filename(buf));
  			fclose(f2);
  		     }
  
