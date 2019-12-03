@@ -17,17 +17,18 @@ Summary(fr.UTF-8):	Une librairie de programmation de jeux
 Summary(it.UTF-8):	Una libreria per la programmazione di videogiochi
 Summary(pl.UTF-8):	Biblioteka do programowania gier
 Name:		allegro
-Version:	4.4.2
-Release:	6
+# NOTE: keep 4.x here; for 5.x see allegro5.spec
+Version:	4.4.3.1
+Release:	1
 License:	Giftware
 Group:		Libraries
-Source0:	http://downloads.sourceforge.net/alleg/%{name}-%{version}.tar.gz
-# Source0-md5:	4db71b0460fc99926ae91d223199c2e6
+#Source0Download: https://github.com/liballeg/allegro5/releases
+Source0:	https://github.com/liballeg/allegro5/releases/download/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	d0435da87d4c157ad3620e1cc58b807e
 Patch0:		%{name}-info.patch
 Patch1:		%{name}-config.patch
 Patch2:		%{name}-man-prefix.patch
-Patch3:		%{name}-format.patch
-URL:		http://alleg.sourceforge.net/
+URL:		https://liballeg.org/
 BuildRequires:	OpenGL-GLU-devel
 BuildRequires:	OpenGL-devel
 %{?with_alsa:BuildRequires:	alsa-lib-devel >= 0.9}
@@ -39,7 +40,6 @@ BuildRequires:	libstdc++-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.600
-BuildRequires:	sed >= 4.0
 %{?with_svga:BuildRequires:	svgalib-devel}
 BuildRequires:	texinfo
 BuildRequires:	xorg-lib-libX11-devel
@@ -49,6 +49,8 @@ BuildRequires:	xorg-lib-libXpm-devel
 BuildRequires:	xorg-lib-libXxf86dga-devel
 BuildRequires:	xorg-lib-libXxf86vm-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		pkgver	4.4.3
 
 %description
 Allegro is a cross-platform library intended for use in computer games
@@ -342,9 +344,6 @@ biblioteki allegro.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-
-%{__sed} -i -e 's/ADDON_LINKAGE STATIC/ADDON_LINKAGE SHARED/' CMakeLists.txt
 
 %build
 install -d build
@@ -366,19 +365,19 @@ install -d $RPM_BUILD_ROOT%{_mandir}/man3
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install modules.lst $RPM_BUILD_ROOT%{_libdir}/allegro/%{version}
+cp -p modules.lst $RPM_BUILD_ROOT%{_libdir}/allegro/%{pkgver}
 
 # install examples and tests
 find build/examples -maxdepth 1 -perm 755 -name "ex*" -exec install {} $RPM_BUILD_ROOT%{_bindir} \;
 find build/tests -maxdepth 1 -perm 755 ! -name CMakeFiles -exec install {} $RPM_BUILD_ROOT%{_bindir} \;
 
 # force install man pages
-cp build/docs/man/* $RPM_BUILD_ROOT%{_mandir}/man3
+cp -p build/docs/man/* $RPM_BUILD_ROOT%{_mandir}/man3
 
-mv $RPM_BUILD_ROOT%{_bindir}/play{,-allegro}
-mv $RPM_BUILD_ROOT%{_bindir}/test{,-allegro}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/play{,-allegro}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/test{,-allegro}
 
-%{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc/allegro-%{version}
+%{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc/allegro-%{pkgver}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -397,12 +396,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS CHANGES THANKS readme.txt todo.txt
+%doc todo.txt docs/txt/{changes,license,readme,thanks}.txt
 %attr(755,root,root) %{_libdir}/liballeg.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liballeg.so.4.4
 %dir %{_libdir}/allegro
-%dir %{_libdir}/allegro/%{version}
-%{_libdir}/allegro/%{version}/modules.lst
+%dir %{_libdir}/allegro/%{pkgver}
+%{_libdir}/allegro/%{pkgver}/modules.lst
 
 %files devel
 %defattr(644,root,root,755)
@@ -420,36 +419,36 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with dga2}
 %files dga2
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-dga2.so
+%attr(755,root,root) %{_libdir}/allegro/%{pkgver}/alleg-dga2.so
 %endif
 
 %files fbcon
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-fbcon.so
+%attr(755,root,root) %{_libdir}/allegro/%{pkgver}/alleg-fbcon.so
 
 %if %{with svga}
 %files svgalib
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-svgalib.so
+%attr(755,root,root) %{_libdir}/allegro/%{pkgver}/alleg-svgalib.so
 %endif
 
 %if %{with vga}
 %files vga
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-vga.so
+%attr(755,root,root) %{_libdir}/allegro/%{pkgver}/alleg-vga.so
 %endif
 
 %if %{with alsa}
 %files alsa
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-alsadigi.so
-%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-alsamidi.so
+%attr(755,root,root) %{_libdir}/allegro/%{pkgver}/alleg-alsadigi.so
+%attr(755,root,root) %{_libdir}/allegro/%{pkgver}/alleg-alsamidi.so
 %endif
 
 %if %{with jack}
 %files jack
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/allegro/%{version}/alleg-jack.so
+%attr(755,root,root) %{_libdir}/allegro/%{pkgver}/alleg-jack.so
 %endif
 
 %files addons

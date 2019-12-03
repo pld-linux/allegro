@@ -12,3 +12,89 @@
  @$@end direntry
  @$This is the Info version of the Allegro manual
  @$
+@@ -12197,7 +12197,7 @@
+       0, 0, 0,  /* Viewer position, in this case, 0/0/0. */
+       0, 0, -1, /* Viewer direction, in this case along negative z. */
+       0, 1, 0,  /* Up vector, in this case positive y. */
+-      32,       /* The FOV, here 45°. */
++      32,       /* The FOV, here 45Â°. */
+       (float)SCREEN_W / (float)SCREEN_H)); /* Aspect ratio. */
+   
+    /* Applying the matrix transforms the point 100/200/-300
+@@ -12384,7 +12384,7 @@
+    The fov parameter specifies the field of view (ie. width of the camera
+    focus) in binary, 256 degrees to the circle format. For typical
+    projections, a field of view in the region 32-48 will work well. 64
+-   (90°) applies no extra scaling - so something which is one unit away
++   (90Â°) applies no extra scaling - so something which is one unit away
+    from the viewer will be directly scaled to the viewport. A bigger FOV
+    moves you closer to the viewing plane, so more objects will appear. A
+    smaller FOV moves you away from the viewing plane, which means you see a
+--- allegro-4.4.3.1/docs/src/makedoc/makedoc.c.orig	2019-03-04 02:30:11.000000000 +0100
++++ allegro-4.4.3.1/docs/src/makedoc/makedoc.c	2019-12-03 16:16:18.533920627 +0100
+@@ -29,6 +29,7 @@
+  */
+ 
+ 
++#include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stddef.h>
+@@ -70,7 +71,7 @@
+ static void _add_line(char *buf, int flags);
+ static void _add_toc_line(const char *buf, const char *alt, int root, int num, int texinfoable, int htmlable, int otherfile);
+ static void _add_external_file(const char *buf, int line_number);
+-static char *_my_fgets(char *p, int max, FILE *f);
++static char *_my_fgets(char *p, int max, FILE *f, bool expand);
+ static void _add_toc(char *buf, int root, int num, int texinfoable, int htmlable);
+ static void _activate_email_mangling(const char *txt);
+ static void _mangle_email_links(char *buf);
+@@ -314,6 +316,7 @@
+    char buf[1024];
+    FILE *f;
+    int line = 0;
++   bool expand = true;
+ 
+    /*printf("reading %s\n", filename);*/
+ 
+@@ -321,7 +324,7 @@
+    if (!f)
+       return 1;
+       
+-   while (_my_fgets(buf, 1023, f)) {
++   while (_my_fgets(buf, 1023, f, expand)) {
+       char *end = strpbrk(buf, "\r\n");
+       line++;
+ 
+@@ -503,7 +506,13 @@
+ 	 else if (strincmp(buf+1, "external-css=") == 0)
+ 	    html_css_filename = m_strdup(buf+14);
+ 	 else if (buf[1] == '$')
++	 {
++            if (strincmp(buf+2, "@direntry") == 0)
++              expand = false;
++            else if (strincmp(buf+2, "@end direntry") == 0)
++              expand = true;
+ 	    _add_line(buf+2, TEXINFO_FLAG | TEXINFO_CMD_FLAG);
++	 }
+ 	 else if (buf[1] == '@') {
+ 	    char *found_struct_definition = strstr(buf+2, "struct @");
+ 	    if(!found_struct_definition)
+@@ -761,7 +770,7 @@
+  * on the character buffer being modifiable, so cleaning this would
+  * practically mean having to rewrite the other functions too.
+  */
+-static char *_my_fgets(char *p, int max, FILE *f)
++static char *_my_fgets(char *p, int max, FILE *f, bool expand)
+ {
+    int c, ch;
+ 
+@@ -779,7 +788,7 @@
+ 	 c--;
+       else if (p[c] == '\n')
+ 	 break;
+-      else if (p[c] == '\t') {
++      else if (expand && (p[c] == '\t')) {
+ 	 p[c] = ' ';
+ 	 while ((c+1) & 7) {
+ 	    c++;
